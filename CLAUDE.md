@@ -2,7 +2,7 @@
 
 AI-assisted visual inspection and SOP agent for a manufacturing shop floor, built as an FDE candidate assignment. The brief is in `business_docs/FDE_Candidate_Assignment.pdf`; read it before making design choices.
 
-The assignment is time-boxed to 4–5 focused hours. Prefer the simplest version that satisfies each requirement, and note any shortcut in `README.md`.
+Prefer the simplest version that satisfies each requirement, and note any shortcut in `README.md`.
 
 ## Hard constraints
 
@@ -30,18 +30,21 @@ Everything runs in Docker (the API, Ollama, and any tooling). Do not install any
 
 ## Stack
 
-Nothing here is decided except Ollama as the local model runtime, which the brief requires. The rest is what the brief suggests, listed as options only:
+Decided during the build; the reasons are in `docs/DECISION_LOG.md`.
 
 - API: FastAPI, Uvicorn, Pydantic
-- Vision and OCR: OpenCV, Pillow, EasyOCR or pytesseract, optionally Ultralytics YOLOv8n
-- Vector store: ChromaDB, FAISS, or an in-memory cosine index
-- Agent and RAG: LangChain, LlamaIndex, or plain Python
+- Vision and OCR: classical OpenCV, Tesseract through pytesseract
+- Knowledge: ChromaDB, `bge-m3` embeddings and `llama3.1` served by Ollama
+- Agent: a plain-Python loop with structured output, no agent framework
+- Storage: SQLite for audit records and learning scores, MongoDB for conversations
 
 ## Endpoints
 
 - `POST /inspect` — text query, optional part image, optional `work_order_id`
 - `POST /feedback` — transaction ID and a 0/1 score; updates the learning loop directly
 - `GET /transactions/{id}` — replays a past decision trace and its configuration
+- `POST /approvals` — a person approves or rejects a proposed action
+- `GET /audit/verify` — checks the fingerprint chain of the audit records
 
 ## RL loop
 

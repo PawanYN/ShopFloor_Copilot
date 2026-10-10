@@ -43,7 +43,8 @@ Tools:
 - "ask_worker": asks the worker one question and waits for the reply. "input": the question. Use it only when it is unclear what the worker wants.
 - "send_to_person": hands the case to a supervisor or quality lead. "input": the reason. Use it when you are unsure and a wrong answer could harm a part.
 
-Use the facts and the steps already taken. Do not repeat a step that has already been done."""
+"check_photo" and "check_work_order" only gather facts; they do not answer the worker. After them, use "search_rules" to give the worker the answer.
+Use the facts and the steps already taken. Never repeat a step that has already been done."""
 
 
 @dataclass
@@ -116,6 +117,7 @@ def run_turn(
         return None if deadline is None else deadline - time.monotonic()
 
     facts = {"vision": vision, "work_order_id": work_order_id, "work_order": None}
+    gathered: set[tuple[str, str]] = set()
     trace: list[dict[str, Any]] = []
     usage = {"model_calls": 0, "prompt_tokens": 0, "completion_tokens": 0}
 
@@ -213,6 +215,11 @@ def run_turn(
             entry["result"] = result
             entry["seconds"] = round(time.perf_counter() - started, 2)
 
+        if tool in ("check_photo", "check_work_order") and (tool, tool_input) in gathered:
+            done("this was already done and its result is in the facts; use search_rules now to answer the worker")
+            continue
+        gathered.add((tool, tool_input))
+
         if tool == "check_photo":
             if image is None:
                 done("no photo was sent, so there is nothing to check")
@@ -254,7 +261,10 @@ def run_turn(
             check_part = step["check_part"] and seen is not None
             top_k, choice = choose_top_k(seen["defect_category"] if seen else NO_IMAGE)
             chosen["top_k"], chosen["choice"] = top_k, choice
-            hits = retrieve(search_text(tool_input or message, seen if check_part else None), top_k)
+            # For a part check the search is built from the worker's words and the defect seen, not from the
+            # model's wording, so the right limits are found whatever the model typed.
+            query = search_text(message, seen) if check_part else (tool_input or message)
+            hits = retrieve(query, top_k)
             try:
                 if check_part:
                     answer = check_measurement(client, model, hits, seen, time_left())

@@ -1,39 +1,27 @@
 # ShopFloor Copilot — FDE Decision Rationale
 
-Answers to Section G of the candidate assignment (3–5 sentences each), plus the RL action-space justification that Section E asks for. Each answer is written from the entries in [DECISION_LOG.md](DECISION_LOG.md).
+Answers to Section G of the assignment, plus the action-axis justification that Section E asks for. Each answer is drawn from the entries in [DECISION_LOG.md](DECISION_LOG.md), where every choice is recorded with the options considered and the evidence.
 
-## 1. Vector RAG vs. vectorless / long-context read
+## 1. Vector RAG vs. a long-context read
 
-_Why vector RAG fits this SOP corpus, and what would change if the plant's SOP set were fixed at 20 pages instead of continuously growing._
+A plant's SOP set keeps growing and being revised, and every answer on a shop floor has to name the clause it came from. So I split each SOP into its numbered sections, retrieve a few, and have the model answer only from those; a revised SOP is re-indexed alone and each answer cites document, section and revision. The cost argument is about tokens, because tokens decide how many questions one GPU can serve. I measured it: the top three sections cost 495 prompt tokens, while my whole five-document set (1,632 words) costs 2,954, six times more. At the same rate a 20-page set of about 10,000 words is roughly 16,000 tokens, over 30 times the retrieved prompt, and the gap widens as documents are added. If the set were fixed at 20 pages I would drop retrieval: put the whole set at the start of the prompt, let the server process it once and reuse it, and remove retrieval misses altogether. That is a real gain, because in my own test the top result missed the right section in 4 of 21 questions.
 
-TODO
+## 2. Agent loop vs. a fixed pipeline, and what I would not make agentic
 
-## 2. Agent loop vs. fixed pipeline
+Requests on the line vary too much for one fixed path: some have a photo and some do not, some ask about the part and some ask who to call, and some need the work order. A fixed pipeline would run vision and the work-order lookup on every request or need a rule for every phrasing, so the model chooses among five tools and my code writes down each step and its stated reason as it happens. The one part I would not make agentic is the accept, rework or scrap comparison. The model only copies the limits out of the SOP text and never sees the measurement; ordinary code compares the number, sends any reading within the camera's 0.5 mm error of a limit to a person, and escalates when two SOPs disagree. I reached this by measurement: when one prompt asked the model to classify, read limits and decide together, two models got 6 and 9 of 19 cases right, and a wrong comparison ships a bad part.
 
-_Why an agent loop is justified for the tool-selection step, and the one part of this system that should NOT be agentic, and why._
+## 3. Classical CV, a pretrained model, or both
 
-TODO
+I used classical OpenCV only: threshold to find the part, measure its outline, then look for a line-shaped mark, where a straight thin mark is a scratch and a wandering one is a crack. The brief says the point is to demonstrate the technique, and rules give two things a pretrained classifier does not: a measurement in millimetres and a reason that can be read in the audit trail. An off-the-shelf model knows everyday objects, not scratches, and the brief rules out training. The honest limit is that I wrote the rules and the image generator together, so 100 of 100 on generated images shows the rules work on that generator, not on real parts. I would fine-tune a custom model once real photos show rule accuracy dropping under varied lighting and surface finish and there are a few hundred labelled examples per category.
 
-## 3. Defect classifier: classical CV, pretrained model, or both
+## 4. The first cost lever when scaling from one plant to ten
 
-_Why this choice, and what would push toward fine-tuning a custom model instead._
+I would apply caching first, and specifically caching of the limits read from each SOP section. In a photo check the model's only job is to copy the limits out of the retrieved sections, and it never sees the measurement, so its output is the same every time those sections come up. Storing that output per section and revision removes the model call from most photo checks, with no change in quality, and a revised section simply drops its cached limits. The other levers come later for reasons I measured or can state: the small model tier got 15 of 19 decisions right and is not safe enough to route to; the models served through Ollama are already quantized; batching helps throughput but a worker with a part in hand needs an answer now; and a smaller fine-tuned model needs production data that a pilot does not have yet.
 
-TODO
+## 5. A shop-floor governance risk this design does not yet address
 
-## 4. First cost-optimization lever when scaling from one plant to ten
+A misread work-order ID can pass every check and attach a defect to the wrong work order. On my harder image set, 3 of 100 stamped IDs were read with one wrong digit, for example `WO-38522` for `WO-38322`, and each still matched the ID format, so the system accepted it. On a shop floor that is not a cosmetic error: the wrong order gets held, reworked or scrapped, and the real defective part moves on with a clean record. The audit trail would faithfully record the wrong ID, which makes the mistake look verified. In a real engagement I would close it in three layers: a check digit in the stamped ID so a single wrong digit is rejected, a lookup that the work order exists and is open at that inspection station, and an operator confirmation of the ID before any hold or scrap proposal is filed.
 
-_Which of prompt/response caching, model tiering, batching, a smaller fine-tuned model, or quantization to apply first, and why that one before the others._
+## Action axis for the learning loop (Section E)
 
-TODO
-
-## 5. Unaddressed shop-floor governance risk
-
-_One governance risk specific to a shop floor (not a generic AI risk) that this design does not yet fully address, and how to close it in a real engagement._
-
-TODO
-
-## RL action space
-
-_Which single axis the bandit optimizes (OCR engine or RAG top-K), and why that axis over the other._
-
-TODO
+The loop tunes the RAG top-K, choosing between 1, 3 and 5 passages for each defect type, and not the OCR engine. Top-K affects every request, including text-only questions, while the OCR engine matters only when a photo is sent; and a worker's thumbs up or down reflects the answer, which top-K changes directly and the OCR engine barely touches. It also has a real quality and speed trade-off to learn: in my retrieval test the right section was in the top 1 for 17 of 21 questions, the top 3 for 20, and the top 5 for all 21, while every extra passage adds reading time. The best value plausibly differs by defect type, because a crack needs the limit, the scrap rule and the escalation contact together, while a part with no defect needs one passage. I used an epsilon-greedy bandit and not Q-learning because each request is a single independent choice with no chain of states for Q-learning to exploit. Replaying real answers through it showed the per-defect behaviour I expected: for scratches the choice moved from 1 passage to 3, because one scratch case is answered wrongly with a single passage, while for size deviations it moved from 3 to 1, because the answers were equally right and the fastest setting won. On my laptop the raw answer times of one to two minutes swamp the 10 points for a right answer, so the replay divides the measured seconds by 20 to stand in for a suitable server, and the README shows both versions.

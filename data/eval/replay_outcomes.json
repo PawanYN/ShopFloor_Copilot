@@ -1,0 +1,461 @@
+{
+ "model": "llama3.1",
+ "outcomes": [
+  {
+   "case": "scratch well under the limit",
+   "state": "surface_scratch",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 68.56,
+   "decision": "accept"
+  },
+  {
+   "case": "scratch well under the limit",
+   "state": "surface_scratch",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 115.86,
+   "decision": "accept"
+  },
+  {
+   "case": "scratch well under the limit",
+   "state": "surface_scratch",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 126.48,
+   "decision": "accept"
+  },
+  {
+   "case": "scratch just under the limit",
+   "state": "surface_scratch",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 28.24,
+   "decision": "escalate"
+  },
+  {
+   "case": "scratch just under the limit",
+   "state": "surface_scratch",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 80.99,
+   "decision": "escalate"
+  },
+  {
+   "case": "scratch just under the limit",
+   "state": "surface_scratch",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 93.68,
+   "decision": "escalate"
+  },
+  {
+   "case": "scratch just over the limit",
+   "state": "surface_scratch",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 29.03,
+   "decision": "escalate"
+  },
+  {
+   "case": "scratch just over the limit",
+   "state": "surface_scratch",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 84.5,
+   "decision": "escalate"
+  },
+  {
+   "case": "scratch just over the limit",
+   "state": "surface_scratch",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 98.8,
+   "decision": "escalate"
+  },
+  {
+   "case": "scratch in the rework range",
+   "state": "surface_scratch",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 27.08,
+   "decision": "rework"
+  },
+  {
+   "case": "scratch in the rework range",
+   "state": "surface_scratch",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 78.12,
+   "decision": "rework"
+  },
+  {
+   "case": "scratch in the rework range",
+   "state": "surface_scratch",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 99.38,
+   "decision": "rework"
+  },
+  {
+   "case": "scratch where two documents disagree",
+   "state": "surface_scratch",
+   "top_k": 1,
+   "correct": false,
+   "seconds": 30.72,
+   "decision": "rework"
+  },
+  {
+   "case": "scratch where two documents disagree",
+   "state": "surface_scratch",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 80.3,
+   "decision": "escalate"
+  },
+  {
+   "case": "scratch where two documents disagree",
+   "state": "surface_scratch",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 98.09,
+   "decision": "escalate"
+  },
+  {
+   "case": "scratch over every limit",
+   "state": "surface_scratch",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 27.71,
+   "decision": "scrap"
+  },
+  {
+   "case": "scratch over every limit",
+   "state": "surface_scratch",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 78.32,
+   "decision": "scrap"
+  },
+  {
+   "case": "scratch over every limit",
+   "state": "surface_scratch",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 121.8,
+   "decision": "scrap"
+  },
+  {
+   "case": "crack",
+   "state": "crack",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 62.64,
+   "decision": "escalate"
+  },
+  {
+   "case": "crack",
+   "state": "crack",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 105.36,
+   "decision": "escalate"
+  },
+  {
+   "case": "crack",
+   "state": "crack",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 105.14,
+   "decision": "escalate"
+  },
+  {
+   "case": "size close to the tolerance limit",
+   "state": "dimensional_deviation",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 40.19,
+   "decision": "escalate"
+  },
+  {
+   "case": "size close to the tolerance limit",
+   "state": "dimensional_deviation",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 126.74,
+   "decision": "escalate"
+  },
+  {
+   "case": "size close to the tolerance limit",
+   "state": "dimensional_deviation",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 125.38,
+   "decision": "escalate"
+  },
+  {
+   "case": "oversize between two limits",
+   "state": "dimensional_deviation",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 37.72,
+   "decision": "escalate"
+  },
+  {
+   "case": "oversize between two limits",
+   "state": "dimensional_deviation",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 130.0,
+   "decision": "escalate"
+  },
+  {
+   "case": "oversize between two limits",
+   "state": "dimensional_deviation",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 125.59,
+   "decision": "escalate"
+  },
+  {
+   "case": "undersize between two limits",
+   "state": "dimensional_deviation",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 37.05,
+   "decision": "escalate"
+  },
+  {
+   "case": "undersize between two limits",
+   "state": "dimensional_deviation",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 129.05,
+   "decision": "escalate"
+  },
+  {
+   "case": "undersize between two limits",
+   "state": "dimensional_deviation",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 123.73,
+   "decision": "escalate"
+  },
+  {
+   "case": "oversize beyond rework",
+   "state": "dimensional_deviation",
+   "top_k": 1,
+   "correct": false,
+   "seconds": 22.94,
+   "decision": "escalate"
+  },
+  {
+   "case": "oversize beyond rework",
+   "state": "dimensional_deviation",
+   "top_k": 3,
+   "correct": false,
+   "seconds": 72.38,
+   "decision": "escalate"
+  },
+  {
+   "case": "oversize beyond rework",
+   "state": "dimensional_deviation",
+   "top_k": 5,
+   "correct": false,
+   "seconds": 174.01,
+   "decision": "accept"
+  },
+  {
+   "case": "good part",
+   "state": "no_defect",
+   "top_k": 1,
+   "correct": false,
+   "seconds": 32.13,
+   "decision": "escalate"
+  },
+  {
+   "case": "good part",
+   "state": "no_defect",
+   "top_k": 3,
+   "correct": false,
+   "seconds": 86.5,
+   "decision": "escalate"
+  },
+  {
+   "case": "good part",
+   "state": "no_defect",
+   "top_k": 5,
+   "correct": false,
+   "seconds": 198.39,
+   "decision": "escalate"
+  },
+  {
+   "case": "contact by role and shift",
+   "state": "no_image",
+   "top_k": 1,
+   "correct": false,
+   "seconds": 22.64,
+   "decision": "no_exact_answer"
+  },
+  {
+   "case": "contact by role and shift",
+   "state": "no_image",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 13.73,
+   "decision": "inform"
+  },
+  {
+   "case": "contact by role and shift",
+   "state": "no_image",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 13.94,
+   "decision": "inform"
+  },
+  {
+   "case": "who approves scrap",
+   "state": "no_image",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 13.99,
+   "decision": "escalate"
+  },
+  {
+   "case": "who approves scrap",
+   "state": "no_image",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 12.08,
+   "decision": "escalate"
+  },
+  {
+   "case": "who approves scrap",
+   "state": "no_image",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 13.4,
+   "decision": "escalate"
+  },
+  {
+   "case": "blurred photo",
+   "state": "no_image",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 12.63,
+   "decision": "inform"
+  },
+  {
+   "case": "blurred photo",
+   "state": "no_image",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 14.94,
+   "decision": "inform"
+  },
+  {
+   "case": "blurred photo",
+   "state": "no_image",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 16.51,
+   "decision": "inform"
+  },
+  {
+   "case": "welding a crack",
+   "state": "no_image",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 14.56,
+   "decision": "inform"
+  },
+  {
+   "case": "welding a crack",
+   "state": "no_image",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 13.39,
+   "decision": "inform"
+  },
+  {
+   "case": "welding a crack",
+   "state": "no_image",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 14.34,
+   "decision": "inform"
+  },
+  {
+   "case": "response time",
+   "state": "no_image",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 14.34,
+   "decision": "inform"
+  },
+  {
+   "case": "response time",
+   "state": "no_image",
+   "top_k": 3,
+   "correct": false,
+   "seconds": 14.09,
+   "decision": "inform"
+  },
+  {
+   "case": "response time",
+   "state": "no_image",
+   "top_k": 5,
+   "correct": false,
+   "seconds": 14.69,
+   "decision": "inform"
+  },
+  {
+   "case": "no rule: dent",
+   "state": "no_image",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 19.66,
+   "decision": "no_exact_answer"
+  },
+  {
+   "case": "no rule: dent",
+   "state": "no_image",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 21.06,
+   "decision": "no_exact_answer"
+  },
+  {
+   "case": "no rule: dent",
+   "state": "no_image",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 20.33,
+   "decision": "no_exact_answer"
+  },
+  {
+   "case": "no rule: clamp torque",
+   "state": "no_image",
+   "top_k": 1,
+   "correct": true,
+   "seconds": 14.25,
+   "decision": "no_exact_answer"
+  },
+  {
+   "case": "no rule: clamp torque",
+   "state": "no_image",
+   "top_k": 3,
+   "correct": true,
+   "seconds": 21.54,
+   "decision": "no_exact_answer"
+  },
+  {
+   "case": "no rule: clamp torque",
+   "state": "no_image",
+   "top_k": 5,
+   "correct": true,
+   "seconds": 22.36,
+   "decision": "no_exact_answer"
+  }
+ ]
+}

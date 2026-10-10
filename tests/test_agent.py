@@ -40,10 +40,25 @@ def test_judging_the_part_before_checking_the_photo_is_sent_back():
 
 
 def test_running_out_of_steps_is_escalated():
-    result, _ = turn([step("check_work_order")] * 5)
+    result, _ = turn([step("check_work_order", "WO-19651")] * 5)
     assert (result.decision, result.reason) == ("escalate", "step_limit")
     assert len(result.trace) == 5 and result.proposed_action["status"] == "pending_approval"
     assert "ask your supervisor" in result.answer
+    # The lookup ran once; the repeats were refused and the model was told what to do instead.
+    assert "status in inspection" in result.trace[0]["result"]
+    assert all("already done" in s["result"] for s in result.trace[1:])
+
+
+def test_a_part_check_searches_with_the_defect_seen_not_the_models_wording():
+    searched = []
+
+    def recording_retrieve(text, top_k):
+        searched.append(text)
+        return retrieve(text, top_k)
+
+    client = ScriptedClient([step("search_rules", "WO-64962 acceptable", True), LIMITS_REPLY])
+    run_turn(client, "m", recording_retrieve, "Is it OK?", vision=scratch(15.0), choose_top_k=lambda state: (3, "best_known"))
+    assert searched == ["Is it OK? (surface scratch limits)"]
 
 
 def test_the_model_can_ask_the_worker_or_hand_over_to_a_person():

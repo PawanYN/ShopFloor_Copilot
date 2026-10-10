@@ -182,6 +182,7 @@ Figures are after the size-measurement change of decision 2.4a. Before it they w
 - Options considered: vector search that passes only the relevant passages to the model; reading the whole document set on every question.
 - Choice: vector search, as the brief requires. Position for the rationale: it is right here because the SOP set keeps growing and answers must cite their source, but for a set fixed at 20 pages, reading everything would be the better design.
 - Why: in production the cost of a question is the number of tokens the model must process, and that sets how many questions one GPU can serve. Vector search sends a few hundred tokens per question; reading a 20-page set sends about 14,000, roughly 30 times more compute per question, and the gap widens as the set grows. Each answer can also name the exact passage it used, which supports the audit trail, and a changed document is re-indexed alone. Reading everything has no search step, so nothing can be missed, and it is simpler.
+- Measured (2026-10-10, prompt tokens counted by the model server for one plain question with `llama3.1`, each including 271 tokens of instructions): top 1 passage 348; top 3 passages 495; top 5 passages 644; all 30 passages, the whole set of 1,632 words, 2,954. Reading the whole set costs six times the top-3 prompt. At the same rate a 20-page set of about 10,000 words is roughly 16,000 tokens, over 30 times the top-3 prompt, which matches the earlier estimate.
 - What would change it: a fixed, small document set (about 20 pages), where the whole set fits in the prompt and can be processed once and reused.
 - Feeds Section G question: 1.
 
@@ -303,7 +304,22 @@ Figures are after the size-measurement change of decision 2.4a. Before it they w
 | `llama3.1` (8B) | named in the brief; strong at tool calling |
 | `qwen2.5` (7B) | named in the brief; strong at structured output and multilingual text |
 
-- Evaluation result: to be recorded here.
+- Evaluation result (2026-10-10): 19 test cases (12 with a camera result, 7 plain questions), top 5 passages, run on a local machine. Three of the four models were tested; the run was stopped during `qwen2.5` to save time, so it has no result.
+
+| Model | Right decision | With a camera result | Plain questions | Average time per case |
+|---|---|---|---|---|
+| `llama3.2` (3B) | 15/19 | 9/12 | 6/7 | 35 s |
+| `mistral` (7B) | 16/19 | 10/12 | 6/7 | 169 s |
+| `llama3.1` (8B) | 17/19 | 10/12 | 7/7 | 112 s |
+
+  - What is and is not measured: only whether the final decision was right. The run was stopped before the detailed results were saved, so the checks on the rule cited and the reason, and the judge model's check of the written sentences (3.9), were not completed. The times are from a development machine whose graphics card is too small for the 7B and 8B models, so they are slow here and say little about a plant server.
+  - All three models failed the same two size cases: a part 2.6 mm oversize, and a good part.
+  - `llama3.1` gave the one unsafe result in the test: it accepted the part that is 2.6 mm oversize, where the right result is scrap. The other two models sent that case to a person, which is wrong but safe.
+  - An earlier version of the instructions to the model asked it to do three jobs at once (decide the kind of question, copy the limits, write the answer). With it, `llama3.2` got 9/19 and `mistral` 6/19. Splitting it into two simple jobs raised `llama3.2` to 15/19.
+- Model selected: `llama3.1`.
+- Why: it had the most right decisions and was the only one to get every plain question right. It is also one of the models the brief names.
+- Known weakness, not fixed: reading the size limits. The size rule has four ranges with directions (oversize, undersize), and no model copied it out reliably. The unsafe "accept" above comes from this.
+- What would change it: completing the test with `qwen2.5` and the judge, or a fix for the size-limit reading that changes the ranking.
 - Feeds Section G question: 4.
 
 ### 3.2 — Whether a second language model is used
@@ -604,6 +620,23 @@ Figures are after the size-measurement change of decision 2.4a. Before it they w
 - What would change it: real feedback from workers on the line, which would replace the replay.
 - Feeds Section G question: the action-axis justification (Section E).
 
+### 5.10a — Slow answers on the local machine in the learning demonstration
+
+- Date: 2026-10-10
+- The problem: the score is (thumbs up × 10) − seconds waited. On the development machine an answer takes 55 to 120 seconds, because its graphics card is too small for the chosen model. A right answer then scores about −100 and a wrong one about −110, so the waiting time swamps the thumbs up and the system would only learn "fewer passages is faster".
+- Options considered: show the demonstration with the raw local seconds; adjust the time so the demonstration reflects the hardware a plant would use.
+- Choice: adjust the time for the demonstration. The real answer times are measured on the local machine and saved as measured. In the replay they are divided by a stated factor (`--time-scale`), so a local answer of about 100 seconds counts as a few seconds, as it would on a plant server. The service itself is not changed: `/feedback` uses the brief's formula with the real seconds, and the factor defaults to 1.
+- Why: the brief's formula balances a thumbs up (10 points) against a wait of a few seconds. That balance only exists when answers take seconds, not minutes. Dividing the time keeps the real differences between the settings (more passages is still slower by the same proportion) while restoring the balance the formula was designed for.
+- What is honest to say: the right-or-wrong results and the relative speed of the settings are real; the absolute seconds in the replay are scaled, and the README states the factor used. A run with the raw seconds is shown next to it.
+- Result (2026-10-10): 57 real answers were collected with `llama3.1` (19 cases at 1, 3 and 5 passages). Right answers: 15/19 with 1 passage, 16/19 with 3, 16/19 with 5. Average time: 29 s, 67 s and 85 s. Replayed for 600 rounds with seed 7 and the seconds divided by 20:
+  - `surface_scratch` shifted from 1 passage (25 of the first 30 questions) to 3 passages (27 of the last 30), because one scratch case is wrong with 1 passage and right with 3.
+  - `dimensional_deviation` shifted from 3 passages (20 of the first 30) to 1 passage (26 of the last 30), because the answers are equally right at every value and the fastest wins.
+  - `crack` and `no_defect` stayed on 1 passage; `no_image` settled on 3.
+  - With the raw seconds, every defect type with a photo stayed on 1 passage throughout, the wrong-answer setting winning on speed alone. This confirms the problem the factor addresses.
+  - Limits: few cases per defect type (one each for `crack` and `no_defect`), marks from a program and not a worker, and a quality difference of one case in nineteen.
+- What would change it: running on hardware where the model answers in a few seconds, which removes the need for any factor.
+- Feeds Section G question: the action-axis justification (Section E).
+
 ### 5.11 — Whether the record says the system was trying another setting
 
 - Date: 2026-10-10
@@ -675,7 +708,7 @@ Figures are after the size-measurement change of decision 2.4a. Before it they w
 
 - Date: 2026-10-10
 - Options considered: 10 seconds; 30 seconds; longer.
-- Choice: the limit is a setting. In this repository it defaults to 120 seconds, because development and review happen on a local machine where the larger models are slow. The value intended for a real plant is 10 seconds.
+- Choice: the limit is a setting. In this repository it defaults to 300 seconds, because development and review happen on a local machine where the larger models are slow. It was first set to 120 seconds; in the fresh-start test the first photo question took 128 seconds on the development laptop and got the ready-made reply, so it was raised. The value intended for a real plant is 10 seconds.
 - Why 10 seconds for a plant: the score is 10 points for a thumbs up minus the seconds waited, so after 10 seconds even a good answer scores zero or less; waiting longer cannot pay off. It also suits a worker standing at a machine with a part in hand.
 - Why longer locally: on the development machine the larger models take well over 10 or 30 seconds, so a short limit would replace almost every answer with the ready-made reply and the rest of the system could not be shown working.
 - How it is applied: the limit covers the whole request. Each call to the model is given only the time that is left; when it runs out the call is dropped and the ready-made reply (6.8) is returned. The slow call is not tried again.
@@ -719,3 +752,18 @@ Figures are after the size-measurement change of decision 2.4a. Before it they w
 - The ID is assumed to be stamped in a fixed area, and defects are generated outside it. A crack or scratch that crosses the ID is neither detected as a defect nor read reliably. (Noticed in Phase 1 build.)
 - The camera's measuring error (about 0.5 mm) is half of a typical 1.0 mm size tolerance. Measurement practice expects the instrument to be several times finer than the limit it checks, so a part near the limit could be accepted or rejected wrongly. Closing it needs a higher-resolution camera or lens for size checks, or a gauge for parts that measure close to the limit. (Noticed at decision 2.4a.)
 - The model chooses whether to look at a sent photo (decision 4.7), so it can skip one. If it answers from the SOPs alone while the photo shows a crack, the crack is never seen. Closing it needs a rule that a sent photo is always inspected, or a check that stops the model finishing without it. (Noticed at decision 4.7.)
+
+## Found in the whole-system test (2026-10-10)
+
+The whole system was run with a real model (`llama3.1`), MongoDB and all parts together: a photo with approval and feedback, a plain question, a conversation with a follow-up, a work-order question and a question with no rule.
+
+Fixed after the test:
+
+- The model looked up the same work order five times and gave up. A repeated photo check or work-order lookup is now refused with a hint to answer the worker, and the model is told that these two tools only gather facts.
+- In a follow-up message the model typed a poor search phrase, so the crack rule was not found. For a part check, the search is now built by code from the worker's words and the defect type seen, not from the model's wording.
+
+Left open on purpose:
+
+- The first answer for each defect type uses only 1 passage, because the learning loop tries each setting once at the start, beginning with 1. With 1 passage the question "Who is the Quality Lead on the night shift?" got "I don't have an exact rule"; with 3 it was answered correctly. The loop works as designed, but the first answers are weaker.
+- The model sometimes marks a plain answer as "must go to a person". For "Who must approve a scrap decision?" it gave the right answer and also raised a proposal for a supervisor, which is not needed.
+- Reading the size limits (see 3.1): no tested model copies the four-range size rule out reliably, and `llama3.1` once accepted a part that should be scrapped.

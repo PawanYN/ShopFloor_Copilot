@@ -5,15 +5,14 @@ CHROMA_PATH = os.getenv("CHROMA_PATH", "/data/chroma")
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL") or "bge-m3"
-# Chosen by the answer evaluation (decision 3.1); unset until then.
-ANSWER_MODEL = os.getenv("ANSWER_MODEL", "")
+ANSWER_MODEL = os.getenv("ANSWER_MODEL") or "llama3.1"
 JUDGE_MODEL = os.getenv("JUDGE_MODEL") or "gemma3:12b"
 MODEL_CONTEXT_TOKENS = int(os.getenv("MODEL_CONTEXT_TOKENS", "8192"))
 
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://mongo:27017")
 MAX_AGENT_STEPS = int(os.getenv("MAX_AGENT_STEPS", "5"))
-# Whole-request time limit before the ready-made reply. 120 suits a local machine; 10 is the value meant for a plant.
-LATENCY_CEILING_SECONDS = float(os.getenv("LATENCY_CEILING_SECONDS", "120"))
+# Whole-request time limit before the ready-made reply. 300 suits a local machine; 10 is the value meant for a plant.
+LATENCY_CEILING_SECONDS = float(os.getenv("LATENCY_CEILING_SECONDS", "300"))
 # After this long without a decision, a proposed action is shown as overdue (SOP-03 section 3.4).
 APPROVAL_DUE_MINUTES = float(os.getenv("APPROVAL_DUE_MINUTES", "30"))
 

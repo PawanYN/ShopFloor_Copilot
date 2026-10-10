@@ -1,5 +1,13 @@
 # ShopFloor Copilot — Roadmap and Architecture
 
+## Status
+
+The build is complete. This document is kept as the original plan. Where the build went differently, [DECISION_LOG.md](DECISION_LOG.md) is the record of what was decided and why. The main changes from this plan:
+
+- The agent has five tools, not four: "ask the worker" was added, and conversations are remembered and stored in MongoDB (decisions 4.5 and 4.10).
+- Two endpoints were added to the three the brief requires: `/approvals` for the human-approval step and `/audit/verify` for the audit check (decisions 6.5 and 6.2).
+- For a part check, the model only copies the limits from the SOP text and code does the comparison (decision 3.7).
+
 ## Purpose
 
 The assignment weights the written decision rationale (Section G) equally with the code. Instead of writing that rationale at the end, each decision is made deliberately during the build and recorded at that moment.

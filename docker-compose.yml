@@ -7,19 +7,36 @@ services:
       DATABASE_PATH: /data/audit.db
       CHROMA_PATH: /data/chroma
       OLLAMA_URL: http://ollama:11434
-      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-}
-      ANSWER_MODEL: ${ANSWER_MODEL:-}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-bge-m3}
+      ANSWER_MODEL: ${ANSWER_MODEL:-llama3.1}
       MONGO_URL: mongodb://mongo:27017
+      LATENCY_CEILING_SECONDS: ${LATENCY_CEILING_SECONDS:-300}
     volumes:
       - appdata:/data
     depends_on:
-      - ollama
-      - mongo
+      mongo:
+        condition: service_started
+      models:
+        condition: service_completed_successfully
 
   ollama:
     image: ollama/ollama
     volumes:
       - ollama:/root/.ollama
+
+  # Downloads the two models on first start (several GB), then exits. Later starts find them already present.
+  models:
+    image: ollama/ollama
+    depends_on:
+      - ollama
+    environment:
+      OLLAMA_HOST: ollama:11434
+    # Wait until the model server answers, then pull.
+    entrypoint:
+      - sh
+      - -c
+      - "until ollama list >/dev/null 2>&1; do sleep 2; done; ollama pull ${EMBEDDING_MODEL:-bge-m3} && ollama pull ${ANSWER_MODEL:-llama3.1}"
+    restart: "no"
 
   mongo:
     image: mongo:7
