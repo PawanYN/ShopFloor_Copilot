@@ -393,7 +393,7 @@ Figures are after the size-measurement change of decision 2.4a. Before it they w
 ### 3.9 — How answer quality is checked
 
 - Date: 2026-10-10
-- Options considered: a test with known correct answers, marked by a program; a person reading and judging answers; an LLM as judge, either a local model or a cloud model (Claude); a combination.
+- Options considered: a test with known correct answers, marked by a program; a person reading and judging answers; an LLM as judge, either a local model or a cloud model; a combination.
 - Choice: three checks together.
   1. A program scores the boxes (decision, rule used, limits read) against known correct answers, on about 15 test cases.
   2. A local LLM, larger than and different from the four models being tested, judges the sentence: does it say only what the cited rule says?
