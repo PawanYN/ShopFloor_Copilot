@@ -25,3 +25,20 @@ A part ID that is read wrongly can still look correct, and then a defect is reco
 ## Action axis for the learning loop (Section E)
 
 I chose the RAG top-K as the setting to learn, with 1, 3 or 5 passages, and not the OCR engine. Top-K changes every answer, even for a question without a photo, and it changes the thing the worker gives a thumbs up or down for. It also has a real trade-off: in my test the right section was found 17 of 21 times with 1 passage and 21 of 21 with 5, but more passages take longer to read. When I replayed real answers, the system learned different values for different defects: for scratches it moved from 1 passage to 3, and for size problems from 3 to 1. My laptop is slow, so I divided the measured seconds by 20 for this replay, and the README shows the result both ways.
+
+## What I chose not to build
+
+Each of these was a deliberate choice, usually after a test. The details are in the decision log.
+
+| Not built | Why |
+|---|---|
+| An agent framework (LangChain, LlamaIndex) | The agent has five tools. My own loop is about 100 lines, and my code writes each step into the record, which is what the brief grades. |
+| Reranking, keyword search, query rewriting | I tested plain vector search first: the right section was in the top 3 for 20 of 21 questions and in the top 5 for all 21, including the questions about names and titles. There was no measured miss to fix. |
+| A second, smaller model as the backup for slow answers | The small model got only 15 of 19 decisions right. When the main model is too slow, the worker gets the matching SOP sections with no model-written text, so nothing can be made up. |
+| Answer caching | A saved answer can be out of date after an SOP revision. I named the safe version (saving only the limits per section) as the first cost lever, and left it for when there is real traffic. |
+| A pretrained or fine-tuned vision model | Training was not allowed, and a ready-made model does not know scratches or cracks. Rules also give a measurement, which a classifier does not. |
+| An evaluation framework (RAGAS, DeepEval) | I have about 20 test cases. A small script that a reviewer can read is clearer than framework scores I could not fully explain. |
+| A separate table of tolerance limits in code | The limits live only in the SOP text, so quality engineering changes a limit by revising a document, with no code change. |
+| PostgreSQL, authentication, a user interface | The brief puts these out of scope. Storage sits behind one small interface so PostgreSQL can replace SQLite later. |
+
+I also went beyond the brief in three places, and I want to be open about that: the assistant remembers a conversation, there is a real approval endpoint instead of only a "pending" note, and the audit records carry a fingerprint chain. Each one came from a specific shop-floor need, but in a tighter time-box I would cut conversation memory first.
