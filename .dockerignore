@@ -1,0 +1,8 @@
+.git
+.claude
+business_docs
+docs
+**/__pycache__
+.pytest_cache
+*.db
+*.sqlite

@@ -1,6 +1,6 @@
 # ShopFloor Copilot — FDE Decision Rationale
 
-Answers to Section G of the candidate assignment (3–5 sentences each), plus the RL action-space justification that Section E asks for.
+Answers to Section G of the candidate assignment (3–5 sentences each), plus the RL action-space justification that Section E asks for. Each answer is written from the entries in [DECISION_LOG.md](DECISION_LOG.md).
 
 ## 1. Vector RAG vs. vectorless / long-context read
 

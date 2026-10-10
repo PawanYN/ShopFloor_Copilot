@@ -1,0 +1,98 @@
+{
+  "no_defect_01.png": {
+    "category": "no_defect",
+    "measurement": {
+      "name": "deviation_mm",
+      "value": 0.25
+    },
+    "id": "WO-19651"
+  },
+  "no_defect_02.png": {
+    "category": "no_defect",
+    "measurement": {
+      "name": "deviation_mm",
+      "value": 0.25
+    },
+    "id": "WO-32791"
+  },
+  "no_defect_03.png": {
+    "category": "no_defect",
+    "measurement": {
+      "name": "deviation_mm",
+      "value": 0.0
+    },
+    "id": "WO-45280"
+  },
+  "surface_scratch_01.png": {
+    "category": "surface_scratch",
+    "measurement": {
+      "name": "length_mm",
+      "value": 19.5
+    },
+    "id": "WO-89448"
+  },
+  "surface_scratch_02.png": {
+    "category": "surface_scratch",
+    "measurement": {
+      "name": "length_mm",
+      "value": 27.02
+    },
+    "id": "WO-64962"
+  },
+  "surface_scratch_03.png": {
+    "category": "surface_scratch",
+    "measurement": {
+      "name": "length_mm",
+      "value": 30.45
+    },
+    "id": "WO-29628"
+  },
+  "crack_01.png": {
+    "category": "crack",
+    "measurement": {
+      "name": "length_mm",
+      "value": 31.83
+    },
+    "id": "WO-47051"
+  },
+  "crack_02.png": {
+    "category": "crack",
+    "measurement": {
+      "name": "length_mm",
+      "value": 36.93
+    },
+    "id": "WO-71786"
+  },
+  "crack_03.png": {
+    "category": "crack",
+    "measurement": {
+      "name": "length_mm",
+      "value": 33.36
+    },
+    "id": "WO-19701"
+  },
+  "dimensional_deviation_01.png": {
+    "category": "dimensional_deviation",
+    "measurement": {
+      "name": "deviation_mm",
+      "value": 3.75
+    },
+    "id": "WO-81451"
+  },
+  "dimensional_deviation_02.png": {
+    "category": "dimensional_deviation",
+    "measurement": {
+      "name": "deviation_mm",
+      "value": 4.75
+    },
+    "id": "WO-37280"
+  },
+  "dimensional_deviation_03.png": {
+    "category": "dimensional_deviation",
+    "measurement": {
+      "name": "deviation_mm",
+      "value": 3.75
+    },
+    "id": "WO-65563"
+  }
+}

@@ -6,22 +6,24 @@ Everything runs on open-source, local tooling. No managed cloud AI APIs are used
 
 ## Status
 
-Work in progress. The repository currently holds the assignment brief and the decision-rationale outline; the implementation has not been added yet.
+Work in progress. The repository currently holds the assignment brief, the roadmap and the decision-rationale outline; the implementation has not been added yet.
+
+The plan, the architecture and the open design decisions are in [docs/ROADMAP.md](docs/ROADMAP.md). Tools and approaches are chosen phase by phase and recorded in [docs/DECISION_LOG.md](docs/DECISION_LOG.md).
 
 ## Planned components
 
-- **API** (FastAPI): `POST /inspect`, `POST /feedback`, `GET /transactions/{id}`
+- **API**: `POST /inspect`, `POST /feedback`, `GET /transactions/{id}`
 - **Vision and OCR**: defect classification and work-order / part-ID extraction
 - **Knowledge layer**: vector retrieval over mock SOP documents, with a local LLM via Ollama
 - **Agent loop**: ReAct-style tool selection with an explicit decision trace
-- **Adaptive optimization**: a contextual bandit updated from user feedback
+- **Adaptive optimization**: a lightweight learning loop updated from user feedback
 - **Governance**: append-only audit log, human approval for escalate/scrap actions, and a latency fallback
 
 ## Repository layout
 
 | Path | Contents |
 |---|---|
-| [docs/](docs/) | Project documentation, including [DECISIONS.md](docs/DECISIONS.md) |
+| [docs/](docs/) | [ROADMAP.md](docs/ROADMAP.md), [DECISION_LOG.md](docs/DECISION_LOG.md) and [DECISIONS.md](docs/DECISIONS.md) |
 | [business_docs/](business_docs/) | The assignment brief |
 
 ## Setup

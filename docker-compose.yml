@@ -1,0 +1,32 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_PATH: /data/audit.db
+      CHROMA_PATH: /data/chroma
+      OLLAMA_URL: http://ollama:11434
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-}
+      ANSWER_MODEL: ${ANSWER_MODEL:-}
+      MONGO_URL: mongodb://mongo:27017
+    volumes:
+      - appdata:/data
+    depends_on:
+      - ollama
+      - mongo
+
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama:/root/.ollama
+
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongodata:/data/db
+
+volumes:
+  appdata:
+  mongodata:
+  ollama:
