@@ -33,7 +33,7 @@ Four containers start:
 | `mongo` | stores conversations |
 | `models` | downloads the two models on first start, then exits |
 
-Speed depends on hardware. On the development laptop (a 4 GB graphics card, too small for the model) one answer takes 1 to 3 minutes. The time limit before the ready-made reply is therefore set to 300 seconds; set `LATENCY_CEILING_SECONDS=10` on a server with a suitable GPU.
+Speed depends on hardware. On the development laptop (a 4 GB graphics card, too small for the model) one answer takes 1 to 5 minutes. The time limit before the ready-made reply is therefore set to 600 seconds; set `LATENCY_CEILING_SECONDS=10` on a server with a suitable GPU.
 
 ## Try each endpoint
 
@@ -247,7 +247,7 @@ Set these as environment variables before `docker compose up`.
 |---|---|---|
 | `ANSWER_MODEL` | `llama3.1` | the Ollama model that plans steps and writes answers |
 | `EMBEDDING_MODEL` | `bge-m3` | the Ollama model used for search |
-| `LATENCY_CEILING_SECONDS` | `300` | whole-request time limit before the ready-made reply; 10 is the value meant for a plant |
+| `LATENCY_CEILING_SECONDS` | `600` | whole-request time limit before the ready-made reply; 10 is the value meant for a plant |
 
 Other settings (top-K choices, explore rate, learning step, agent step limit, approval due time) are in [app/config.py](app/config.py).
 

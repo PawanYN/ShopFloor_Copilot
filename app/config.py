@@ -11,8 +11,8 @@ MODEL_CONTEXT_TOKENS = int(os.getenv("MODEL_CONTEXT_TOKENS", "8192"))
 
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://mongo:27017")
 MAX_AGENT_STEPS = int(os.getenv("MAX_AGENT_STEPS", "5"))
-# Whole-request time limit before the ready-made reply. 300 suits a local machine; 10 is the value meant for a plant.
-LATENCY_CEILING_SECONDS = float(os.getenv("LATENCY_CEILING_SECONDS", "300"))
+# Whole-request time limit before the ready-made reply. 600 suits a local machine; 10 is the value meant for a plant.
+LATENCY_CEILING_SECONDS = float(os.getenv("LATENCY_CEILING_SECONDS", "600"))
 # After this long without a decision, a proposed action is shown as overdue (SOP-03 section 3.4).
 APPROVAL_DUE_MINUTES = float(os.getenv("APPROVAL_DUE_MINUTES", "30"))
 

@@ -10,7 +10,7 @@ services:
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-bge-m3}
       ANSWER_MODEL: ${ANSWER_MODEL:-llama3.1}
       MONGO_URL: mongodb://mongo:27017
-      LATENCY_CEILING_SECONDS: ${LATENCY_CEILING_SECONDS:-300}
+      LATENCY_CEILING_SECONDS: ${LATENCY_CEILING_SECONDS:-600}
     volumes:
       - appdata:/data
     depends_on:

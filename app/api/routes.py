@@ -1,3 +1,4 @@
+import logging
 import time
 import uuid
 
@@ -16,6 +17,7 @@ from app.guardrails.approvals import photo_fingerprint, proposed_action_now
 from app.learning.bandit import NO_IMAGE, reward_for
 
 router = APIRouter()
+log = logging.getLogger("uvicorn.error")
 
 
 @router.get("/health")
@@ -44,6 +46,13 @@ def inspect(
         fields.update(image=photo, image_filename=image.filename)
     else:
         photo, vision = conversation["image"], conversation["vision"]
+    log.info(
+        "inspect %s: query=%r, photo=%s, work order=%s",
+        transaction_id,
+        query,
+        image.filename if image else ("from earlier in the conversation" if photo else "none"),
+        work_order_id or conversation["work_order_id"] or "none",
+    )
 
     result = run_turn(
         state.model_client,
@@ -104,6 +113,15 @@ def inspect(
         ],
         {**fields, "vision": result.vision, "work_order_id": result.work_order_id},
     )
+    log.info(
+        "inspect %s: decision=%s (%s) after %d steps and %d model calls, %.1fs",
+        transaction_id,
+        result.decision,
+        result.reason,
+        len(result.trace),
+        result.model_calls,
+        latency,
+    )
 
     return InspectResponse(
         transaction_id=transaction_id,
@@ -139,6 +157,7 @@ def feedback(request: Request, body: FeedbackRequest) -> FeedbackResponse:
         learned_for = record["defect_category"] or NO_IMAGE
         value = request.app.state.bandit.update(learned_for, top_k, reward, body.transaction_id)
         learning = {"state": learned_for, "rag_top_k": top_k, "reward": reward, "score_after": round(value, 3)}
+    log.info("feedback %s: score=%d, reward=%.2f, learning=%s", body.transaction_id, body.score, reward, learning)
     return FeedbackResponse(
         transaction_id=body.transaction_id, score=body.score, recorded=True, reward=reward, learning=learning
     )
@@ -178,6 +197,7 @@ def approve(request: Request, body: ApprovalRequest) -> TransactionResponse:
     store.add_event(
         body.transaction_id, "approval", {"decision": body.decision, "approver": body.approver, "note": body.note}
     )
+    log.info("approval %s: %s by %s", body.transaction_id, body.decision, body.approver)
     return _transaction(store, body.transaction_id)
 
 

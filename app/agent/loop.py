@@ -4,6 +4,7 @@ The record of steps is written here, as each step happens (decision 4.9). The mo
 supplies only its choice and its reason.
 """
 
+import logging
 import time
 from dataclasses import dataclass, field
 from typing import Any, Callable
@@ -14,6 +15,8 @@ from app.knowledge.store import Hit
 from app.learning.bandit import NO_IMAGE
 from app.llm import ModelClient, ModelTimeout
 from app.vision.inspect import inspect_image
+
+log = logging.getLogger("uvicorn.error")
 
 TOOLS = ("check_photo", "search_rules", "check_work_order", "send_to_person", "ask_worker")
 
@@ -158,6 +161,7 @@ def run_turn(
         if not chosen:
             chosen["top_k"], chosen["choice"] = choose_top_k(seen["defect_category"] if seen else NO_IMAGE)
         hits = retrieve(search_text(message, seen), chosen["top_k"])
+        log.warning("time limit of %g seconds passed: sending the ready-made reply", time_limit)
         trace.append(
             {
                 "step": len(trace) + 1,
@@ -192,6 +196,7 @@ def run_turn(
 
     for number in range(1, max_steps + 1):
         started = time.perf_counter()
+        log.info("step %d: asking %s which tool to use next", number, model)
         try:
             reply = client.chat_json(
                 model,
@@ -203,6 +208,7 @@ def run_turn(
         except ModelTimeout:
             return fall_back()
         except Exception as error:
+            log.exception("step %d: the planning model failed", number)
             trace.append({"step": number, "tool": None, "input": "", "why": "", "result": f"the planning model failed: {error}", "seconds": 0.0})
             return finish("I could not work this out. Please ask your supervisor.", "escalate", "planner_failed")
         count(reply)
@@ -210,10 +216,12 @@ def run_turn(
         tool, tool_input = step["tool"], step["input"].strip()
         entry = {"step": number, "tool": tool, "input": tool_input, "why": step["why"].strip()}
         trace.append(entry)
+        log.info("step %d: chose %s(%s) because: %s", number, tool, tool_input, entry["why"])
 
         def done(result: str) -> None:
             entry["result"] = result
             entry["seconds"] = round(time.perf_counter() - started, 2)
+            log.info("step %d: %s -> %s (%.2fs)", number, tool, result, entry["seconds"])
 
         if tool in ("check_photo", "check_work_order") and (tool, tool_input) in gathered:
             done("this was already done and its result is in the facts; use search_rules now to answer the worker")
@@ -265,6 +273,7 @@ def run_turn(
             # model's wording, so the right limits are found whatever the model typed.
             query = search_text(message, seen) if check_part else (tool_input or message)
             hits = retrieve(query, top_k)
+            log.info("step %d: found %d passages (top %d, %s); asking %s for the answer", number, len(hits), top_k, choice, model)
             try:
                 if check_part:
                     answer = check_measurement(client, model, hits, seen, time_left())
@@ -274,6 +283,7 @@ def run_turn(
                 done(f"searched top {top_k} passages ({choice}); the model ran out of time")
                 return fall_back()
             except Exception as error:
+                log.exception("step %d: the answering model failed", number)
                 done(f"the answering model failed: {error}")
                 return finish("I could not work this out. Please ask your supervisor.", "escalate", "answer_failed")
             usage["model_calls"] += 1
